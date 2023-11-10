@@ -1,0 +1,128 @@
+この記事は筆者の[ソロ Advent Calender 2022](https://qiita.com/advent-calendar/2022/panda) 12日目の記事です。
+
+前回Kotestのデータ駆動テスト(Data Driven Testing)について紹介いたしましたが、せっかくなのでもう少し実務を想定した書き方について紹介します。
+
+前回の記事は[こちら](https://qiita.com/JY8752/private/f0ffdc6795c57e9e9b63)
+
+# mockkでテーブル駆動テストを書く
+実際のプロジェクトでは何かしらのフレームワークを利用していたり、DIの仕組みがあったり、クリーンアーキテクチャのようなレイヤーアーキテクチャを採用していたりするケースが多いと思います。
+
+そこに複雑な仕様が入ってくるとテストするクラスや関数も前回の記事で紹介したような綺麗な関数ばかりではないでしょうし、テストを実行するためのテストデータを用意するのも容易ではないかもしれません。
+
+そんな時にはmockを採用すると良いかもしれません。(mock反対派がいることをちょうど書いてる時に知ったけど筆者はmockは賛成派。だけどmockを使ったテストはちゃんと書かないとテストになってないこともあるからなんとも言えない。)
+
+今回はKotlinのモックライブラリであるmockkを使ってデータ駆動テストを書いてみます。
+
+とりあえず、依存関係を追加。
+
+```kotlin:build.gradle.kts
+    // mockk
+    testImplementation("io.mockk:mockk:1.13.2")
+```
+
+テスト対象のクラスとして以下のようなクラスを用意します。
+
+```kotlin:HelloService.kt
+class HelloComponent {
+    fun getMessage(language: String): String {
+        // なんかDB接続したり色々処理がある想定
+        return ""
+    }
+}
+
+class HelloService(private val helloComponent: HelloComponent) {
+    fun hello(language: String): String {
+        return this.helloComponent.getMessage(language) + " Data Driven Testing!!"
+    }
+}
+```
+
+あんまり良い例が思いつかなかったので、少し適当ですがHelloServiceがHelloComponentを依存関係として持っており、helloメソッドでHelloComponentのgetMessageを呼び出しています。
+
+getMessageメソッドは引数に言語コードを文字列として受け取り戻り値が変わる想定です。実際のプロジェクトではこのcomponentの処理でDBから値を取得したり、更新が入ったりすることが多いと思うのですが外部APIやDB接続が実行される場合、そのテストを行うために実行環境やテストデータを用意する必要がありテスト難易度がかなり上がる時があります。
+
+なので、今回はHelloComponentをモック化してみます。mockkを使用するとこのように書ける。
+
+```kotlin
+    val mock = mockk<HelloComponent>()
+    val service = HelloService(mock)
+```
+
+このmockの振る舞いは以下のように設定することができる。
+
+```kotlin
+every { mock.getMessage(language) } returns message
+```
+
+これを前回の記事で書いたようなデータ駆動テストで書いてみるとこんな感じで書ける。
+
+```HelloServiceTest.kt
+internal class HelloServiceTest : FunSpec({
+    val mock = mockk<HelloComponent>()
+    val service = HelloService(mock)
+    context("test hello") {
+        data class TestPattern(val language: String, val message: String, val expect: String)
+        withData(
+            mapOf(
+                "language is English" to TestPattern("en", "Hello!!", "Hello!! Data Driven Testing!!"),
+                "language is Japanese" to TestPattern("ja", "こんにちは!!", "こんにちは!! Data Driven Testing!!"),
+                "language is Chinese" to TestPattern("zh", "ニーハオ!!", "ニーハオ!! Data Driven Testing!!"),
+            )
+        ) { (language, message, expect, isError) ->
+            every { mock.getMessage(language) } returns message
+            service.hello(language) shouldBe expect
+        }
+    }
+})
+```
+
+良い感じ。
+
+HelloComponentにエラー処理を追加してみる。
+
+```diff_kotlin
+class HelloService(private val helloComponent: HelloComponent) {
+    fun hello(language: String): String {
++        if (language.isEmpty()) throw RuntimeException("ちょっと何言ってるかわからないです。")
+        return this.helloComponent.getMessage(language) + " Data Driven Testing!!"
+    }
+}
+```
+
+テストも以下のように修正
+
+```diff_kotlin:HelloServiceTest.kt
+internal class HelloServiceTest : FunSpec({
+    val mock = mockk<HelloComponent>()
+    val service = HelloService(mock)
+    context("test hello") {
++        data class TestPattern(val language: String, val message: String, val expect: String? = null, val isError: Boolean = false)
+        withData(
+            mapOf(
+                "language is English" to TestPattern("en", "Hello!!", "Hello!! Data Driven Testing!!"),
+                "language is Japanese" to TestPattern("ja", "こんにちは!!", "こんにちは!! Data Driven Testing!!"),
+                "language is Chinese" to TestPattern("zh", "ニーハオ!!", "ニーハオ!! Data Driven Testing!!"),
++                "language is Unknown" to TestPattern("", "ちょっと何言ってるかわからないです。", isError = true)
+            )
+        ) { (language, message, expect, isError) ->
+            every { mock.getMessage(language) } returns message
++            if (isError) {
++                shouldThrow<RuntimeException> { service.hello(language) }.message shouldBe message
++            } else {
+                service.hello(language) shouldBe expect
++            }
+        }
+    }
+})
+```
+
+実際のプロジェクトではこんなに簡単に書けることはないでしょうがこんな感じでmockとデータ駆動テストを組み合わせてテストを書くことができるよという話でした
+
+# まとめ
+
+- テストデータの作成や外部環境の準備に心が折れそうになった方はmockを導入すると幸せになれるかもしれないという話をしました
+- データ駆動テストとmockを組み合わせることでテストメソッドの書き方のバリエーションが広がるよという話をしました
+
+今回の記事は前回の記事のおまけのような感じで書きましたがもともと以下のテックブログを読ませていただき大変勉強になり、参考にさせていただきました！！もとはGoのモックパターンの話です!Goを最近書き始めた方やGoを書いていなくてもモックを使用したテストの書き方として非常に勉強になりました！今回は以上です！
+
+https://moneyforward.com/engineers_blog/2021/03/08/go-test-mock/
