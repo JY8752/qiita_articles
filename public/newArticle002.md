@@ -1,13 +1,12 @@
 ---
-title: '初学者が書いたテストはリポジトリに含まれるべきではないのか？'
+title: 初学者が書いたテストはリポジトリに含まれるべきではないのか？
 tags:
-  - 'test'
-  - 'テスト'
-  - 'ポエム'
-  - '初心者'
+  - テスト
+  - 初心者
+  - ポエム
 private: true
-updated_at: ''
-id: null
+updated_at: '2023-11-15T01:14:09+09:00'
+id: 355f393fbaadce7f2e1f
 organization_url_name: null
 slide: false
 ignorePublish: false
