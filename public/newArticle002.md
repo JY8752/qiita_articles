@@ -4,6 +4,7 @@ tags:
   - テスト
   - 初心者
   - ポエム
+  - AdventCalendar2023
 private: true
 updated_at: '2023-11-15T01:14:09+09:00'
 id: 355f393fbaadce7f2e1f
