@@ -1,12 +1,12 @@
 ---
-title: 'サーバーエンジニアだけどFigmaの使い方をUdemyで学んだ話'
+title: サーバーエンジニアだけどFigmaの使い方をUdemyで学んだ話
 tags:
-  - 'AdventCalendar2023'
-  - 'Udemy'
-  - 'Figma'
+  - Udemy
+  - figma
+  - AdventCalendar2023
 private: true
-updated_at: ''
-id: null
+updated_at: '2023-11-15T23:56:33+09:00'
+id: a018d47fb5bde7343787
 organization_url_name: null
 slide: false
 ignorePublish: false
