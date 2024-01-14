@@ -1,13 +1,13 @@
 ---
 title: エンジニアは子供がいると勉強できないのか
 tags:
-  - 'ポエム'
-  - '初心者'
-  - '勉強'
-  - '未経験'
+  - 初心者
+  - ポエム
+  - 勉強
+  - 未経験
 private: false
-updated_at: ''
-id: null
+updated_at: '2024-01-15T01:52:18+09:00'
+id: d9ffda5d36237c44cede
 organization_url_name: null
 slide: false
 ignorePublish: false
