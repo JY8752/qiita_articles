@@ -4,8 +4,8 @@ tags:
   - テスト
   - ポエム
   - AdventCalendar2023
-private: true
-updated_at: '2023-11-15T23:56:33+09:00'
+private: false
+updated_at: '2023-12-01T07:01:24+09:00'
 id: 4f2ba983a613686d4366
 organization_url_name: null
 slide: false

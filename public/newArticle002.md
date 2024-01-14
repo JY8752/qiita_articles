@@ -5,8 +5,8 @@ tags:
   - 初心者
   - ポエム
   - AdventCalendar2023
-private: true
-updated_at: '2023-11-15T23:56:33+09:00'
+private: false
+updated_at: '2023-12-13T07:00:46+09:00'
 id: 355f393fbaadce7f2e1f
 organization_url_name: null
 slide: false

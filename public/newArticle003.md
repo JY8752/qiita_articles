@@ -4,8 +4,8 @@ tags:
   - Udemy
   - figma
   - AdventCalendar2023
-private: true
-updated_at: '2023-11-15T23:56:33+09:00'
+private: false
+updated_at: '2023-12-02T07:01:43+09:00'
 id: a018d47fb5bde7343787
 organization_url_name: null
 slide: false
