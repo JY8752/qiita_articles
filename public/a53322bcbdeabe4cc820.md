@@ -10,8 +10,6 @@ private: false
 updated_at: '2022-12-25T10:16:44+09:00'
 id: a53322bcbdeabe4cc820
 organization_url_name: null
-slide: false
-ignorePublish: false
 ---
 この記事は筆者の[ソロ　Advent Calendar 2022](https://qiita.com/advent-calendar/2022/panda) 22日目の記事です。
 
